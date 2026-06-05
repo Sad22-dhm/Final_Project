@@ -16,7 +16,7 @@ pygame.display.set_caption("Banana Game")
 # =========================
 # COULEURS
 # =========================
-
+bleu = (9,23,227)
 NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
 ROUGE = (255, 0, 0)
@@ -281,7 +281,7 @@ while running:
         texte_score = font.render(
             f"Score : {score}",
             True,
-            NOIR
+            bleu
         )
 
         ecran.blit(
@@ -292,7 +292,7 @@ while running:
         texte_vies = font.render(
             f"Vies : {vies}",
             True,
-            NOIR
+            bleu
         )
 
         ecran.blit(
