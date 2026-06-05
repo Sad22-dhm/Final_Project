@@ -3,30 +3,71 @@ import random
 
 pygame.init()
 
+# =========================
+# FENÊTRE
+# =========================
+
 LARGEUR = 800
 HAUTEUR = 600
 
 ecran = pygame.display.set_mode((LARGEUR, HAUTEUR))
 pygame.display.set_caption("Banana Game")
 
-BLANC = (255,255,255)
-NOIR = (0,0,0)
+# =========================
+# COULEURS
+# =========================
 
-font = pygame.font.SysFont(None, 40)
+NOIR = (0, 0, 0)
+BLANC = (255, 255, 255)
+ROUGE = (255, 0, 0)
+VERT = (0, 180, 0)
+
+# =========================
+# POLICE
+# =========================
+
+font = pygame.font.SysFont(None, 50)
+
+# =========================
+# HORLOGE
+# =========================
+
 clock = pygame.time.Clock()
 
+# =========================
+# FOND
+# =========================
+
+background = pygame.image.load(
+    "assets/background.png"
+).convert()
+
+background = pygame.transform.scale(
+    background,
+    (LARGEUR, HAUTEUR)
+)
+
+# =========================
+# CLASSES
+# =========================
 
 class GameSprite(pygame.sprite.Sprite):
 
     def __init__(self, x, y, w, h, image_path):
         super().__init__()
 
-        self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (w, h))
+        self.image = pygame.image.load(
+            image_path
+        ).convert_alpha()
 
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.image = pygame.transform.scale(
+            self.image,
+            (w, h)
+        )
+
+        self.rect = self.image.get_rect(
+            topleft=(x, y)
+        )
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
@@ -55,8 +96,22 @@ class Player(GameSprite):
 
 class Item(GameSprite):
 
-    def __init__(self, x, y, w, h, image_path, item_type):
-        super().__init__(x, y, w, h, image_path)
+    def __init__(
+        self,
+        x,
+        y,
+        w,
+        h,
+        image_path,
+        item_type
+    ):
+        super().__init__(
+            x,
+            y,
+            w,
+            h,
+            image_path
+        )
 
         self.item_type = item_type
         self.speed = 5
@@ -65,20 +120,54 @@ class Item(GameSprite):
         self.rect.x -= self.speed
 
 
+# =========================
+# JOUEUR
+# =========================
+
 joueur = Player(
     50,
     250,
-    80,
-    80,
+    90,
+    90,
     "player.png"
 )
 
-objets = []
-
-SPAWN = pygame.USEREVENT
-pygame.time.set_timer(SPAWN, 1000)
+# =========================
+# VARIABLES
+# =========================
 
 score = 0
+vies = 3
+
+etat = "jeu"
+
+objets = []
+
+# =========================
+# BOUTON RESTART
+# =========================
+
+bouton_restart = pygame.Rect(
+    300,
+    320,
+    220,
+    80
+)
+
+# =========================
+# SPAWN
+# =========================
+
+SPAWN = pygame.USEREVENT
+
+pygame.time.set_timer(
+    SPAWN,
+    500
+)
+
+# =========================
+# BOUCLE PRINCIPALE
+# =========================
 
 running = True
 
@@ -91,61 +180,161 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == SPAWN:
+        # Création des objets
+        if etat == "jeu":
 
-            if random.choice([True, False]):
+            if event.type == SPAWN:
 
-                objets.append(
-                    Item(
-                        LARGEUR,
-                        random.randint(0, HAUTEUR - 60),
-                        60,
-                        60,
-                        "banana.png",
-                        "banane"
+                if random.choice([True, False]):
+
+                    objets.append(
+                        Item(
+                            LARGEUR,
+                            random.randint(
+                                0,
+                                HAUTEUR - 60
+                            ),
+                            60,
+                            60,
+                            "banana.png",
+                            "banane"
+                        )
                     )
-                )
 
-            else:
+                else:
 
-                objets.append(
-                    Item(
-                        LARGEUR,
-                        random.randint(0, HAUTEUR - 60),
-                        60,
-                        60,
-                        "bomb.png",
-                        "bombe"
+                    objets.append(
+                        Item(
+                            LARGEUR,
+                            random.randint(
+                                0,
+                                HAUTEUR - 60
+                            ),
+                            60,
+                            60,
+                            "bomb.png",
+                            "bombe"
+                        )
                     )
-                )
 
-    joueur.update()
+        # Bouton Restart
+        if event.type == pygame.MOUSEBUTTONDOWN:
 
-    for objet in objets[:]:
+            if etat == "game_over":
 
-        objet.update()
+                if bouton_restart.collidepoint(
+                    event.pos
+                ):
 
-        if joueur.rect.colliderect(objet.rect):
+                    score = 0
+                    vies = 3
 
-            if objet.item_type == "banane":
-                score += 1
-            else:
-                score -= 3
+                    objets.clear()
 
-            objets.remove(objet)
+                    joueur.rect.x = 50
+                    joueur.rect.y = 250
 
-        elif objet.rect.right < 0:
-            objets.remove(objet)
+                    etat = "jeu"
 
-    ecran.fill(BLANC)
+    # =========================
+    # JEU
+    # =========================
 
-    joueur.draw(ecran)
+    if etat == "jeu":
 
-    for objet in objets:
-        objet.draw(ecran)
+        joueur.update()
 
-    texte = font.render(f"Score : {score}", True, NOIR)
-    ecran.blit(texte, (10, 10))
+        for objet in objets[:]:
+
+            objet.update()
+
+            if joueur.rect.colliderect(
+                objet.rect
+            ):
+
+                if objet.item_type == "banane":
+                    score += 1
+
+                elif objet.item_type == "bombe":
+
+                    vies -= 1
+
+                    if vies <= 0:
+                        etat = "game_over"
+
+                objets.remove(objet)
+
+            elif objet.rect.right < 0:
+                objets.remove(objet)
+
+        # Affichage
+        ecran.blit(
+            background,
+            (0, 0)
+        )
+
+        joueur.draw(ecran)
+
+        for objet in objets:
+            objet.draw(ecran)
+
+        texte_score = font.render(
+            f"Score : {score}",
+            True,
+            NOIR
+        )
+
+        ecran.blit(
+            texte_score,
+            (10, 10)
+        )
+
+        texte_vies = font.render(
+            f"Vies : {vies}",
+            True,
+            NOIR
+        )
+
+        ecran.blit(
+            texte_vies,
+            (10, 60)
+        )
+
+    # =========================
+    # GAME OVER
+    # =========================
+
+    else:
+
+        ecran.fill((30, 30, 30))
+
+        texte = font.render(
+            "GAME OVER",
+            True,
+            ROUGE
+        )
+
+        ecran.blit(
+            texte,
+            (250, 180)
+        )
+
+        pygame.draw.rect(
+            ecran,
+            VERT,
+            bouton_restart
+        )
+
+        texte_restart = font.render(
+            "RESTART",
+            True,
+            BLANC
+        )
+
+        ecran.blit(
+            texte_restart,
+            (320, 340)
+        )
 
     pygame.display.flip()
 
