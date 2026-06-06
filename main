@@ -187,44 +187,19 @@ while running:
 
                 if random.choice([True, False]):
 
-                    objets.append(
-                        Item(
-                            LARGEUR,
-                            random.randint(
-                                0,
-                                HAUTEUR - 60
-                            ),
-                            60,
-                            60,
-                            "banana.png",
-                            "banane"
-                        )
-                    )
+                    objets.append( Item(LARGEUR,random.randint(0,HAUTEUR - 60),60,60,"banana.png","banane"))
 
                 else:
 
                     objets.append(
-                        Item(
-                            LARGEUR,
-                            random.randint(
-                                0,
-                                HAUTEUR - 60
-                            ),
-                            60,
-                            60,
-                            "bomb.png",
-                            "bombe"
-                        )
-                    )
+                        Item(LARGEUR,random.randint(0, HAUTEUR - 60),60, 60,"bomb.png","bombe"))
 
         # Bouton Restart
         if event.type == pygame.MOUSEBUTTONDOWN:
 
             if etat == "game_over":
 
-                if bouton_restart.collidepoint(
-                    event.pos
-                ):
+                if bouton_restart.collidepoint(event.pos):
 
                     score = 0
                     vies = 3
@@ -248,9 +223,7 @@ while running:
 
             objet.update()
 
-            if joueur.rect.colliderect(
-                objet.rect
-            ):
+            if joueur.rect.colliderect( objet.rect):
 
                 if objet.item_type == "banane":
                     score += 1
@@ -268,10 +241,7 @@ while running:
                 objets.remove(objet)
 
         # Affichage
-        ecran.blit(
-            background,
-            (0, 0)
-        )
+        ecran.blit(background,(0, 0))
 
         joueur.draw(ecran)
 
@@ -279,26 +249,14 @@ while running:
             objet.draw(ecran)
 
         texte_score = font.render(
-            f"Score : {score}",
-            True,
-            bleu
-        )
+            f"Score : {score}",True,bleu)
 
-        ecran.blit(
-            texte_score,
-            (10, 10)
-        )
+        ecran.blit(texte_score,(10, 10))
 
         texte_vies = font.render(
-            f"Vies : {vies}",
-            True,
-            bleu
-        )
+            f"Vies : {vies}",True,bleu)
 
-        ecran.blit(
-            texte_vies,
-            (10, 60)
-        )
+        ecran.blit(texte_vies,(10, 60) )
 
     # =========================
     # GAME OVER
@@ -308,33 +266,15 @@ while running:
 
         ecran.fill((30, 30, 30))
 
-        texte = font.render(
-            "GAME OVER",
-            True,
-            ROUGE
-        )
+        texte = font.render( "GAME OVER",True,ROUGE)
 
-        ecran.blit(
-            texte,
-            (250, 180)
-        )
+        ecran.blit( texte,(316, 180))
 
-        pygame.draw.rect(
-            ecran,
-            VERT,
-            bouton_restart
-        )
+        pygame.draw.rect(ecran, VERT,bouton_restart)
 
-        texte_restart = font.render(
-            "RESTART",
-            True,
-            BLANC
-        )
+        texte_restart = font.render("RESTART", True, BLANC)
 
-        ecran.blit(
-            texte_restart,
-            (320, 340)
-        )
+        ecran.blit(texte_restart ,(320, 340))
 
     pygame.display.flip()
 
